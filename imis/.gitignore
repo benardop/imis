@@ -33,6 +33,7 @@ build/
 .vscode/
 
 ### Node.js ###
-node
-node_modules
-.parcel-cache
+node/
+node_modules/
+.parcel-cache/
+.env/
