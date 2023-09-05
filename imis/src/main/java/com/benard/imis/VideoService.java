@@ -1,27 +1,51 @@
 package com.benard.imis;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
 public class VideoService {
 
-    private List<Video> videos = List.of(
-            new Video("Fast and Furious"),
-            new Video("Transporter Series"),
-            new Video("Game of thrones")
-    );
+    private final VideoRepository repository;
 
-    public List<Video> getVideos() {
-        return videos;
+    public VideoService(VideoRepository repository) {
+        this.repository = repository;
     }
 
-    public Video createVideo(Video newVideo) {
-        List<Video> extend = new ArrayList<>(videos);
-        extend.add(newVideo);
-        this.videos = List.copyOf(extend);
-        return newVideo;
+//    private List<Video> videos = List.of(
+//            new Video("Fast and Furious"),
+//            new Video("Transporter Series"),
+//            new Video("Game of thrones")
+//    );
+
+    public List<VideoEntity> search(VideoSearch videoSearch) {
+        if (StringUtils.hasText(videoSearch.name())
+            && StringUtils.hasText(videoSearch.description())) {
+            return repository
+                    .findByNameContainsOrDescriptionContainsAllIgnoreCase(
+                            videoSearch.name(), videoSearch.description());
+        }
+
+        if (StringUtils.hasText(videoSearch.name())) {
+            return repository.FindByNameContainsIgnoreCase(videoSearch.name());
+        }
+
+        if (StringUtils.hasText(videoSearch.description())) {
+            return repository.FindByDescriptionContainsIgnoreCase(videoSearch.description());
+        }
+
+        return Collections.emptyList();
+    }
+
+    public List<VideoEntity> getVideos() {
+        return repository.findAll();
+    }
+
+    public VideoEntity create(NewVideo newVideo) {
+        return repository.saveAndFlush(new VideoEntity(newVideo.name(), newVideo.description()));
     }
 }

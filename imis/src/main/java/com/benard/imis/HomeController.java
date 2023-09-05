@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.List;
+
 @Controller
 public class HomeController {
 
@@ -22,13 +24,20 @@ public class HomeController {
     }
 
     @PostMapping("/new-video")
-    public String newVideo(@ModelAttribute Video newVideo) {
-        videoService.createVideo(newVideo);
+    public String newVideo(@ModelAttribute NewVideo newVideo) {
+        videoService.create(newVideo);
         return "redirect:/";
     }
 
     @GetMapping("/react")
     public String react() {
         return "react";
+    }
+
+    @PostMapping("/multi-field-search")
+    public String multiFieldSearch(@ModelAttribute VideoSearch search, Model model) {
+        List<VideoEntity> searchResults = videoService.search(search);
+        model.addAttribute("videos", searchResults);
+        return "index";
     }
 }
